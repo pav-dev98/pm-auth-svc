@@ -11,7 +11,7 @@ import (
 
 	"github.com/pav-dev98/pm-auth-svc/config"
 	"github.com/pav-dev98/pm-auth-svc/internal/repository"
-	pb "github.com/pav-dev98/pm-auth-svc/proto/auth"
+	pb "github.com/pav-dev98/pm-proto/auth"
 )
 
 type AuthServer struct {

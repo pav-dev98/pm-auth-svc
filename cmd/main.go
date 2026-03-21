@@ -10,7 +10,7 @@ import (
 	"github.com/pav-dev98/pm-auth-svc/config"
 	"github.com/pav-dev98/pm-auth-svc/internal/repository"
 	"github.com/pav-dev98/pm-auth-svc/internal/server"
-	pb "github.com/pav-dev98/pm-auth-svc/proto/auth"
+	pb "github.com/pav-dev98/pm-proto/auth"
 )
 
 func main() {
