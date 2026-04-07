@@ -11,6 +11,7 @@ import (
 	"github.com/pav-dev98/pm-auth-svc/internal/repository"
 	"github.com/pav-dev98/pm-auth-svc/internal/server"
 	pb "github.com/pav-dev98/pm-proto/auth"
+	"google.golang.org/grpc/reflection"
 )
 
 func main() {
@@ -28,6 +29,8 @@ func main() {
 	grpcServer := grpc.NewServer()
 	authServer := server.NewAuthServer(repo, cfg)
 	pb.RegisterAuthServiceServer(grpcServer, authServer)
+	// Registrar reflection para que tools como grpcurl puedan descubrir los métodos
+	reflection.Register(grpcServer)
 
 	// 4. Levantar el servidor
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", cfg.GRPCPort))

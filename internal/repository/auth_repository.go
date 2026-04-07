@@ -8,13 +8,16 @@ import (
 	"gorm.io/gorm"
 )
 
-// User modelo de la tabla
-type User struct {
-	ID        uint      `gorm:"primaryKey;autoIncrement"`
-	Email     string    `gorm:"uniqueIndex;not null"`
-	Password  string    `gorm:"not null"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
+// AuthCredantial modelo de la tabla
+type AuthCredantial struct {
+	ID                    uint      `gorm:"primaryKey;autoIncrement"`
+	Email                 string    `gorm:"uniqueIndex;not null" validate:"required,email"`
+	Password              string    `gorm:"not null" validate:"required,min=8"`
+	Role                  string    `gorm:"not null;default:'user'" validate:"required,oneof=user admin"`
+	IsOnboardingComplete  bool      `gorm:"not null;default:false"`
+	IsActive              bool      `gorm:"not null;default:true"`
+	CreatedAt             time.Time
+	UpdatedAt             time.Time
 }
 
 type AuthRepository struct {
@@ -28,30 +31,33 @@ func NewAuthRepository(dsn string) (*AuthRepository, error) {
 	}
 
 	// AutoMigrate crea la tabla si no existe
-	db.AutoMigrate(&User{})
+	db.AutoMigrate(&AuthCredantial{})
 
 	return &AuthRepository{db: db}, nil
 }
 
-// FindByEmail busca un usuario por email
-func (r *AuthRepository) FindByEmail(email string) (*User, error) {
-	var user User
-	result := r.db.Where("email = ?", email).First(&user)
+// FindByEmail busca una credencial por email
+func (r *AuthRepository) FindByEmail(email string) (*AuthCredantial, error) {
+	var authCredantial AuthCredantial
+	result := r.db.Where("email = ?", email).First(&authCredantial)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, nil // no existe
 		}
 		return nil, result.Error
 	}
-	return &user, nil
+	return &authCredantial, nil
 }
 
-// Create guarda un nuevo usuario
-func (r *AuthRepository) Create(email, hashedPassword string) (*User, error) {
-	user := &User{
-		Email:    email,
-		Password: hashedPassword,
+// Create guarda una nueva credencial
+func (r *AuthRepository) Create(email, hashedPassword string) (*AuthCredantial, error) {
+	authCredantial := &AuthCredantial{
+		Email:                email,
+		Password:             hashedPassword,
+		Role:                 "user",
+		IsOnboardingComplete: false,
+		IsActive:             true,
 	}
-	result := r.db.Create(user)
-	return user, result.Error
+	result := r.db.Create(authCredantial)
+	return authCredantial, result.Error
 }
