@@ -87,7 +87,7 @@ grpcurl -plaintext \
 - [x] API gRPC con reflection habilitado
 - [ ] Dockerfile (en progreso)
 - [ ] Refresh token
-- [ ] Tests unitarios
+- [x] Tests unitarios
 - [ ] Códigos de error gRPC más específicos
 
 ---
