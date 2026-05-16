@@ -38,7 +38,8 @@ func main() {
 	hasher := bcrypt.NewBcryptHasher()
 
 	expiration, _ := time.ParseDuration(cfg.JWTExpiration)
-	tokenService := jwt.NewJWTService(cfg.JWTSecret, expiration)
+	refreshExpiration, _ := time.ParseDuration(cfg.JWTRefreshExpiration)
+	tokenService := jwt.NewJWTService(cfg.JWTSecret, expiration, refreshExpiration)
 
 	log.Println("✅ Infraestructura inicializada")
 

@@ -53,3 +53,18 @@ func (mr *MockTokenServiceMockRecorder) GenerateToken(ID, email any) *gomock.Cal
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenerateToken", reflect.TypeOf((*MockTokenService)(nil).GenerateToken), ID, email)
 }
+
+// GenerateRefreshToken mocks base method.
+func (m *MockTokenService) GenerateRefreshToken(ID uint) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GenerateRefreshToken", ID)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GenerateRefreshToken indicates an expected call of GenerateRefreshToken.
+func (mr *MockTokenServiceMockRecorder) GenerateRefreshToken(ID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenerateRefreshToken", reflect.TypeOf((*MockTokenService)(nil).GenerateRefreshToken), ID)
+}

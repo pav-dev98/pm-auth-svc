@@ -17,17 +17,19 @@ func TestLoginCredential_Execute(t *testing.T) {
 	repoErr := errors.New("repository failure")
 	compareErr := errors.New("compare failure")
 	tokenErr := errors.New("token failure")
+	refreshTokenErr := errors.New("refresh token failure")
 
 	tests := []struct {
-		name          string
-		email         string
-		password      string
-		setupMocks    func(*mocks.MockAuthRepository, *mocks.MockPasswordHasher, *mocks.MockTokenService)
-		expectedToken string
-		expectedErr   error
+		name                 string
+		email                string
+		password             string
+		setupMocks           func(*mocks.MockAuthRepository, *mocks.MockPasswordHasher, *mocks.MockTokenService)
+		expectedToken        string
+		expectedRefreshToken string
+		expectedErr          error
 	}{
 		{
-			name:     "returns token when credentials are valid",
+			name:     "returns access and refresh token when credentials are valid",
 			email:    "user@example.com",
 			password: "plain-password",
 			setupMocks: func(repo *mocks.MockAuthRepository, hasher *mocks.MockPasswordHasher, tokenService *mocks.MockTokenService) {
@@ -35,9 +37,11 @@ func TestLoginCredential_Execute(t *testing.T) {
 
 				repo.EXPECT().FindByEmail("user@example.com").Return(cred, nil)
 				hasher.EXPECT().Compare("hashed-password", "plain-password").Return(nil)
-				tokenService.EXPECT().GenerateToken(uint(42), "user@example.com").Return("jwt-token", nil)
+				tokenService.EXPECT().GenerateToken(uint(42), "user@example.com").Return("jwt-access-token", nil)
+				tokenService.EXPECT().GenerateRefreshToken(uint(42)).Return("jwt-refresh-token", nil)
 			},
-			expectedToken: "jwt-token",
+			expectedToken:        "jwt-access-token",
+			expectedRefreshToken: "jwt-refresh-token",
 		},
 		{
 			name:     "returns repository error when find by email fails",
@@ -70,7 +74,7 @@ func TestLoginCredential_Execute(t *testing.T) {
 			expectedErr: errors.New("invalid credentials"),
 		},
 		{
-			name:     "returns token service error when token generation fails",
+			name:     "returns error when access token generation fails",
 			email:    "user@example.com",
 			password: "plain-password",
 			setupMocks: func(repo *mocks.MockAuthRepository, hasher *mocks.MockPasswordHasher, tokenService *mocks.MockTokenService) {
@@ -81,6 +85,20 @@ func TestLoginCredential_Execute(t *testing.T) {
 				tokenService.EXPECT().GenerateToken(uint(42), "user@example.com").Return("", tokenErr)
 			},
 			expectedErr: tokenErr,
+		},
+		{
+			name:     "returns error when refresh token generation fails",
+			email:    "user@example.com",
+			password: "plain-password",
+			setupMocks: func(repo *mocks.MockAuthRepository, hasher *mocks.MockPasswordHasher, tokenService *mocks.MockTokenService) {
+				cred := &domain.AuthCredential{ID: 42, Email: "user@example.com", Password: "hashed-password"}
+
+				repo.EXPECT().FindByEmail("user@example.com").Return(cred, nil)
+				hasher.EXPECT().Compare("hashed-password", "plain-password").Return(nil)
+				tokenService.EXPECT().GenerateToken(uint(42), "user@example.com").Return("jwt-access-token", nil)
+				tokenService.EXPECT().GenerateRefreshToken(uint(42)).Return("", refreshTokenErr)
+			},
+			expectedErr: refreshTokenErr,
 		},
 	}
 
@@ -98,9 +116,10 @@ func TestLoginCredential_Execute(t *testing.T) {
 
 			uc := usecase.NewLoginCredential(repo, hasher, tokenService)
 
-			token, err := uc.Execute(tt.email, tt.password)
+			accessToken, refreshToken, err := uc.Execute(tt.email, tt.password)
 
-			assert.Equal(t, tt.expectedToken, token)
+			assert.Equal(t, tt.expectedToken, accessToken)
+			assert.Equal(t, tt.expectedRefreshToken, refreshToken)
 			assert.Equal(t, tt.expectedErr, err)
 		})
 	}

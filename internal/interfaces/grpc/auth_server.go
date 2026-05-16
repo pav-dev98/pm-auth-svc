@@ -40,13 +40,14 @@ func (s *AuthServer) Register(ctx context.Context, req *pb.RegisterRequest) (*pb
 
 func (s *AuthServer) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
 
-	token, err := s.loginUC.Execute(req.Email, req.Password)
+	accessToken, refreshToken, err := s.loginUC.Execute(req.Email, req.Password)
 	if err != nil {
 		return nil, status.Error(codes.Unauthenticated, err.Error())
 	}
 
 	return &pb.LoginResponse{
-		AccessToken: token,
-		TokenType:   "Bearer",
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+		TokenType:    "Bearer",
 	}, nil
 }

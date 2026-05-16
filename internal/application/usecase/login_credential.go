@@ -23,26 +23,30 @@ func NewLoginCredential(
 	}
 }
 
-func (uc *LoginCredential) Execute(email, password string) (string, error) {
+func (uc *LoginCredential) Execute(email, password string) (string, string, error) {
 
 	cred, err := uc.repo.FindByEmail(email)
-	
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 	if cred == nil {
-		return "", errors.New("invalid credentials")
+		return "", "", errors.New("invalid credentials")
 	}
 
 	err = uc.passwordChecker.Compare(cred.Password, password)
 	if err != nil {
-		return "", errors.New("invalid credentials")
+		return "", "", errors.New("invalid credentials")
 	}
 
-	token, err := uc.tokenService.GenerateToken(cred.ID,cred.Email)
+	accessToken, err := uc.tokenService.GenerateToken(cred.ID, cred.Email)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
-	return token, nil
+	refreshToken, err := uc.tokenService.GenerateRefreshToken(cred.ID)
+	if err != nil {
+		return "", "", err
+	}
+
+	return accessToken, refreshToken, nil
 }

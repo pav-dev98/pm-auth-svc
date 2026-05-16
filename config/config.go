@@ -7,10 +7,11 @@ import (
 )
 
 type Config struct {
-	GRPCPort  string
-	DSN       string
-	JWTSecret string
-	JWTExpiration string
+	GRPCPort             string
+	DSN                  string
+	JWTSecret            string
+	JWTExpiration        string
+	JWTRefreshExpiration string
 }
 
 func Load() *Config {
@@ -26,10 +27,11 @@ func Load() *Config {
 	)
 
 	return &Config{
-		GRPCPort:      getEnv("GRPC_PORT", "50051"),
-		DSN:           dsn,
-		JWTSecret:     getEnv("JWT_SECRET", "secret"),
-		JWTExpiration: getEnv("JWT_EXPIRATION", "24h"),
+		GRPCPort:             getEnv("GRPC_PORT", "50051"),
+		DSN:                  dsn,
+		JWTSecret:            getEnv("JWT_SECRET", "secret"),
+		JWTExpiration:        getEnv("JWT_EXPIRATION", "24h"),
+		JWTRefreshExpiration: getEnv("JWT_REFRESH_EXPIRATION", "168h"),
 	}
 }
 
