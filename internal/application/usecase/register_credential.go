@@ -47,10 +47,15 @@ func (uc *RegisterCredential) Execute(email, password string) (string, string, e
 		return "", "", err
 	}
 
-	token, err := uc.tokenService.GenerateToken(cred.ID, cred.Email)
+	accessToken, err := uc.tokenService.GenerateToken(cred.ID, cred.Email)
 	if err != nil {
 		return "", "", err
 	}
 
-	return token, "", nil
+	refreshToken, err := uc.tokenService.GenerateRefreshToken(cred.ID)
+	if err != nil {
+		return "", "", err
+	}
+
+	return accessToken, refreshToken, nil
 }

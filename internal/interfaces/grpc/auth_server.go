@@ -26,15 +26,15 @@ func NewAuthServer(registerUC *usecase.RegisterCredential, loginUC *usecase.Logi
 
 func (s *AuthServer) Register(ctx context.Context, req *pb.RegisterRequest) (*pb.RegisterResponse, error) {
 
-	token, _, err := s.registerUC.Execute(req.Email, req.Password)
+	accessToken, refreshToken, err := s.registerUC.Execute(req.Email, req.Password)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	return &pb.RegisterResponse{
-		AccessToken:  token,
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
 		TokenType:    "Bearer",
-		RefreshToken: "",
 	}, nil
 }
 
