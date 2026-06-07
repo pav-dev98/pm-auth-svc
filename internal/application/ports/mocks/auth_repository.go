@@ -68,3 +68,46 @@ func (mr *MockAuthRepositoryMockRecorder) FindByEmail(email any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByEmail", reflect.TypeOf((*MockAuthRepository)(nil).FindByEmail), email)
 }
+
+// FindSession mocks base method.
+func (m *MockAuthRepository) FindSession(token string) (*domain.Session, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindSession", token)
+	ret0, _ := ret[0].(*domain.Session)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindSession indicates an expected call of FindSession.
+func (mr *MockAuthRepositoryMockRecorder) FindSession(token any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindSession", reflect.TypeOf((*MockAuthRepository)(nil).FindSession), token)
+}
+
+// RevokeSession mocks base method.
+func (m *MockAuthRepository) RevokeSession(token string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RevokeSession", token)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RevokeSession indicates an expected call of RevokeSession.
+func (mr *MockAuthRepositoryMockRecorder) RevokeSession(token any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RevokeSession", reflect.TypeOf((*MockAuthRepository)(nil).RevokeSession), token)
+}
+
+// SaveSession mocks base method.
+func (m *MockAuthRepository) SaveSession(session *domain.Session) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SaveSession", session)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SaveSession indicates an expected call of SaveSession.
+func (mr *MockAuthRepositoryMockRecorder) SaveSession(session any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveSession", reflect.TypeOf((*MockAuthRepository)(nil).SaveSession), session)
+}

@@ -46,9 +46,10 @@ func main() {
 	// 3. Use cases
 	registerUC := usecase.NewRegisterCredential(repo, hasher, tokenService)
 	loginUC := usecase.NewLoginCredential(repo, hasher, tokenService)
+	refreshUC := usecase.NewRefreshCredential(repo,tokenService)
 
 	// 4. gRPC handler (adapter)
-	authServer := grpcHandler.NewAuthServer(registerUC, loginUC)
+	authServer := grpcHandler.NewAuthServer(registerUC, loginUC, refreshUC)
 
 	// 5. gRPC server
 	grpcServer := grpc.NewServer()

@@ -1,8 +1,10 @@
 package usecase
 
 import (
-	"github.com/pav-dev98/pm-auth-svc/internal/application/ports"
 	"errors"
+
+	"github.com/pav-dev98/pm-auth-svc/internal/application/ports"
+	"github.com/pav-dev98/pm-auth-svc/internal/domain"
 )
 
 type LoginCredential struct {
@@ -24,7 +26,6 @@ func NewLoginCredential(
 }
 
 func (uc *LoginCredential) Execute(email, password string) (string, string, error) {
-
 	cred, err := uc.repo.FindByEmail(email)
 	if err != nil {
 		return "", "", err
@@ -38,7 +39,7 @@ func (uc *LoginCredential) Execute(email, password string) (string, string, erro
 		return "", "", errors.New("invalid credentials")
 	}
 
-	accessToken, err := uc.tokenService.GenerateToken(cred.ID, cred.Email)
+	accessToken, err := uc.tokenService.GenerateToken(cred.ID, cred.Email) // falta agregar roles , permisos
 	if err != nil {
 		return "", "", err
 	}
@@ -47,6 +48,13 @@ func (uc *LoginCredential) Execute(email, password string) (string, string, erro
 	if err != nil {
 		return "", "", err
 	}
+	session := domain.NewSession(refreshToken, cred.ID)
+
+	err = uc.repo.SaveSession(session)
+	if err != nil {
+		return "", "", domain.ErrDatabase
+	}
 
 	return accessToken, refreshToken, nil
 }
+

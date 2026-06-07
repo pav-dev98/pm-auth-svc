@@ -57,5 +57,13 @@ func (uc *RegisterCredential) Execute(email, password string) (string, string, e
 		return "", "", err
 	}
 
+	session := domain.NewSession(refreshToken,cred.ID)
+
+	err = uc.repo.SaveSession(session)
+
+	if err != nil {
+		return "","",err
+	}
+
 	return accessToken, refreshToken, nil
 }

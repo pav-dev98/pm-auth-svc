@@ -39,6 +39,7 @@ func TestLoginCredential_Execute(t *testing.T) {
 				hasher.EXPECT().Compare("hashed-password", "plain-password").Return(nil)
 				tokenService.EXPECT().GenerateToken(uint(42), "user@example.com").Return("jwt-access-token", nil)
 				tokenService.EXPECT().GenerateRefreshToken(uint(42)).Return("jwt-refresh-token", nil)
+				repo.EXPECT().SaveSession(gomock.Any()).Return(nil)
 			},
 			expectedToken:        "jwt-access-token",
 			expectedRefreshToken: "jwt-refresh-token",

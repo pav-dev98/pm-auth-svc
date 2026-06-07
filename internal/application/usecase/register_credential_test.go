@@ -45,6 +45,7 @@ func TestRegisterCredential_Execute(t *testing.T) {
 				})
 				tokenService.EXPECT().GenerateToken(uint(0), "user@example.com").Return("jwt-access-token", nil)
 				tokenService.EXPECT().GenerateRefreshToken(uint(0)).Return("jwt-refresh-token", nil)
+				repo.EXPECT().SaveSession(gomock.Any()).Return(nil)
 			},
 			expectedToken:   "jwt-access-token",
 			expectedRefresh: "jwt-refresh-token",
