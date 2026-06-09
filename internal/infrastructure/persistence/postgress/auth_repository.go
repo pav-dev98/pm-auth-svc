@@ -26,7 +26,7 @@ type SessionModel struct {
 	Revoked       	bool `gorm:"not null"`
 }
 
-func toDomain(m *AuthCredentialModel) *domain.AuthCredential {
+func (m *AuthCredentialModel) toDomain() *domain.AuthCredential {
 	return &domain.AuthCredential{
 		Email:    m.Email,
 		Password: m.Password,
@@ -35,32 +35,28 @@ func toDomain(m *AuthCredentialModel) *domain.AuthCredential {
 	}
 }
 
-func toModel(d *domain.AuthCredential) *AuthCredentialModel {
-	return &AuthCredentialModel{
-		Email:    d.Email,
-		Password: d.Password,
-		Role:     d.Role,
-		IsActive: d.IsActive,
-	}
+func (m *AuthCredentialModel) fromDomain(d *domain.AuthCredential) {
+	m.Email = d.Email
+	m.Password = d.Password
+	m.Role = d.Role
+	m.IsActive = d.IsActive
 }
 
-func toDomainSession(m *SessionModel) *domain.Session {
+func (m *SessionModel) toDomain() *domain.Session {
 	return &domain.Session{
-		ID: m.ID,
-		Token: m.Token,
+		ID:           m.ID,
+		Token:        m.Token,
 		CredentialID: m.CredentialID,
-		ExpiresAt: m.ExpiresAt,
-		Revoked: m.Revoked,
+		ExpiresAt:    m.ExpiresAt,
+		Revoked:      m.Revoked,
 	}
 }
 
-func toModelSession(d *domain.Session) *SessionModel {
-	return &SessionModel{
-		Token: d.Token,
-		CredentialID: d.CredentialID,
-		ExpiresAt: d.ExpiresAt,
-		Revoked: d.Revoked,
-	}
+func (m *SessionModel) fromDomain(d *domain.Session) {
+	m.Token = d.Token
+	m.CredentialID = d.CredentialID
+	m.ExpiresAt = d.ExpiresAt
+	m.Revoked = d.Revoked
 }
 
 type AuthRepository struct {
@@ -80,7 +76,8 @@ func NewAuthRepository(dsn string) (*AuthRepository, error) {
 }
 
 func (r *AuthRepository) Create(cred *domain.AuthCredential) error {
-	model := toModel(cred)
+	var model AuthCredentialModel
+	model.fromDomain(cred)
 	return r.db.Create(&model).Error
 }
 
@@ -97,13 +94,14 @@ func (r *AuthRepository) FindByEmail(email string) (*domain.AuthCredential, erro
 
 	fmt.Println("User found:", model.Email)
 
-	return toDomain(&model), nil
+	return model.toDomain(), nil
 }
 
 func (r * AuthRepository) SaveSession(session *domain.Session) error {
-	model := toModelSession(session)
+	var model SessionModel
+	model.fromDomain(session)
 	return r.db.Create(&model).Error
-} 
+}
 
 func (r * AuthRepository) FindSession(token string) (*domain.Session , error) {
 	var model SessionModel
@@ -116,7 +114,7 @@ func (r * AuthRepository) FindSession(token string) (*domain.Session , error) {
 		return nil, domain.ErrDatabase
 	}
 	fmt.Println("Token found", model.Token)
-	return toDomainSession(&model),nil
+	return model.toDomain(),nil
 }
 
 func (r *AuthRepository) RevokeSession(token string) error {
