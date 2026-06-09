@@ -10,6 +10,33 @@ services:
       - "5432:5432"
     volumes:
       - pm_auth_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d pm_auth"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pm-auth-app
+    environment:
+      GRPC_PORT: "50051"
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: pm_auth
+      JWT_SECRET: tu_super_secreto_cambiame
+      JWT_EXPIRATION: 24h
+      JWT_REFRESH_EXPIRATION: 168h
+    ports:
+      - "50051:50051"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
 
 volumes:
   pm_auth_data:

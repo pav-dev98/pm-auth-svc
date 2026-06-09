@@ -1,0 +1,35 @@
+# Git
+.git
+.gitignore
+
+# Artefactos de build
+bin/
+dist/
+build/
+*.exe
+*.test
+*.out
+
+# Coverage y profiling
+coverage/
+coverage.out
+*.coverprofile
+*.prof
+
+# Entorno local
+.env.local
+.env.*.local
+
+# Docker
+Dockerfile
+.dockerignore
+Docker-compose.yml
+docker-compose.yml
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+
+# Docs
+README.md
